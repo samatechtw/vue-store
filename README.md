@@ -37,8 +37,6 @@ VueStore({
 
 ### Usage
 
-Here is an example of basic usage that includes a response interceptor for handling 403 response codes and converting the body to json.
-
 ```ts
 import { VueStore, VueStorePluginLocal } from '@samatech/vue-store'
 

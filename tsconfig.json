@@ -12,5 +12,10 @@
     "outDir": "dist",
     "declaration": true
   },
-  "include": ["lib/**/*.ts", "src/**/*.d.ts"]
+  "include": ["lib/**/*.ts", "src/**/*.d.ts"],
+  "references": [
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
 }

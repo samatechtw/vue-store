@@ -1,4 +1,3 @@
-import { assert } from '.pnpm/@vue+compiler-core@3.2.29/node_modules/@vue/compiler-core'
 import { DeepReadonly } from 'vue'
 import { Store, Getters, Mutations, Module } from '../lib'
 
@@ -27,7 +26,7 @@ const makeTestModule = () =>
   new Module<TestState, TestStateGetters, TestStateMutations>({
     state: getDefaultState,
     getters: {
-      isDefault: (state) => state.id !== 0 || state.name !== '',
+      isDefault: (state) => state.id === 0 && state.name === '',
       upperCaseName: (state) => state.name.toUpperCase(),
     },
     mutations: {
@@ -78,9 +77,11 @@ describe('vue-store', () => {
       },
     })
 
+    expect(testStore.modules.test.isDefault.value).toBe(true)
     testStore.modules.test.setState({ id: 1, name: 'tester' })
     expect(testStore.modules.test.id.value).toBe(1)
     expect(testStore.modules.test.name.value).toBe('tester')
     expect(testStore.modules.test.upperCaseName.value).toBe('TESTER')
+    expect(testStore.modules.test.isDefault.value).toBe(false)
   })
 })

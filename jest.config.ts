@@ -1,4 +1,5 @@
 module.exports = {
+  rootDir: '.',
   displayName: '@samatech/vue-store',
   globals: {
     'ts-jest': {

@@ -6,5 +6,5 @@ jobs:
     steps:
       - run: echo "Testtttttttttyo!"
       - name: Testttttyo!
-        uses: ./.github/workflows/env-setup.yml
+        uses: ./.github/workflows/env-setup
       - run: echo "Done!"

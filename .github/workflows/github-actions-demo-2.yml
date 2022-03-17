@@ -1,5 +1,12 @@
 name: GitHub Actions Demo 2
 on: [push]
 jobs:
-  Environment-Setup:
+  environment-setup:
     uses: ./.github/workflows/env-setup.yml
+
+  prettier-format:
+    name: Prettier Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check code format
+        run: pnpm run format:check

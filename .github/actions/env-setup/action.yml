@@ -1,19 +1,16 @@
 name: Environment Setup
-on:
-  workflow_call: ~
-jobs:
-  environment-setup:
-    name: Environment setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.1
-        with:
-          version: 6.32.3
-      - name: Set up NodeJS v16
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'pnpm'
-      - name: Install npm modules
-        run: pnpm install
+description: 'Setup PNPM and Node'
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup PNPM
+      uses: pnpm/action-setup@v2.2.1
+      with:
+        version: 6.32.3
+    - name: Set up NodeJS v16
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        cache: 'pnpm'
+    - name: Install npm modules
+      run: pnpm install

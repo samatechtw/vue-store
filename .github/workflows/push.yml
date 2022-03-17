@@ -5,8 +5,6 @@ jobs:
     name: Prettier Format
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout out repository code
-        uses: actions/checkout@v2
       - uses: ./.github/actions/env-setup
       - name: Check code format
         run: pnpm run format:check

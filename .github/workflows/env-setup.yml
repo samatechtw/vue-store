@@ -1,8 +1,16 @@
 name: Environment Setup
 on:
-  workflow_call: ~
+  workflow_call:
+    inputs:
+      username:
+        required: false
+        type: string
+    secrets:
+      token:
+        required: false
 jobs:
   setup-environment:
+    name: Environment Setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out repository code

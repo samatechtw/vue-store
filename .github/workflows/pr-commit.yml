@@ -1,5 +1,7 @@
-name: Push
-on: [push]
+name: PR Commit
+on:
+  pull_request:
+    branches: [main]
 jobs:
   prettier-format:
     name: Prettier Format

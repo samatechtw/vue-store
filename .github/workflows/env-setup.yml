@@ -5,9 +5,6 @@ on:
       username:
         required: false
         type: string
-    secrets:
-      token:
-        required: false
 jobs:
   setup-environment:
     name: Environment Setup

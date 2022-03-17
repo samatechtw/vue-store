@@ -4,5 +4,7 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      -uses: ./.github/workflows/env-setup.yml
-      -run: echo "Done!"
+      - run: echo "Testtttttttttyo!"
+      - name: Testttttyo!
+        uses: ./.github/workflows/env-setup.yml
+      - run: echo "Done!"

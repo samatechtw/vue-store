@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Check code format
         run: pnpm run format:check
@@ -18,7 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Lint source code
         run: npm run lint
@@ -30,7 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Run unit tests
         run: npm run test
@@ -40,7 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Build library
         run: npm run build

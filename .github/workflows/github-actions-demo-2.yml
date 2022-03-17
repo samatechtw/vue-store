@@ -2,7 +2,7 @@ name: GitHub Actions Demo 2
 on: [push]
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v2

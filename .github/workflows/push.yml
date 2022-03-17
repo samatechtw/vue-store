@@ -8,7 +8,7 @@ jobs:
       - name: Checkout out repository code
         uses: actions/checkout@v2
       - name: testttt
-        uses: samatechtw/vue-store/.github/workflows/env-setup
+        uses: ./.github/workflows/env-setup
       - name: Check code format
         run: pnpm run format:check
 

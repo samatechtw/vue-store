@@ -8,6 +8,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
       - name: Testttttyo!
         uses: ./.github/workflows/env-setup
       - run: echo "Done!"

@@ -1,11 +1,6 @@
 name: GitHub Actions Demo 2
 on: [push]
 jobs:
-  Entry:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout out repository code
-        uses: actions/checkout@v2
-
   Environment-Setup:
+    runs-on: ubuntu-latest
     uses: ./.github/workflows/env-setup.yml

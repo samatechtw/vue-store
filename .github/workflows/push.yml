@@ -1,17 +1,11 @@
-name: PR Commit
-
-on:
-  pull_request:
-    branches: [main]
-env:
-  WORKSPACE_ROOT: .
-
+name: Push
+on: [push]
 jobs:
   prettier-format:
     name: Prettier Format
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/env-setup
+      - uses: ./.github/workflows/env-setup.yml
       - name: Check code format
         run: pnpm run format:check
 
@@ -19,7 +13,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/env-setup
+      - uses: ./.github/workflows/env-setup.yml
       - name: Lint source code
         run: npm run lint
       - name: Lint commits
@@ -29,7 +23,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/env-setup
+      - uses: ./.github/workflows/env-setup.yml
       - name: Run unit tests
         run: npm run test
 
@@ -37,6 +31,6 @@ jobs:
     name: Build library
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/env-setup
+      - uses: ./.github/workflows/env-setup.yml
       - name: Build library
         run: npm run build

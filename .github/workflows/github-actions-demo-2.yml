@@ -4,7 +4,10 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Testtttttttttyo!"
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Testttttyo!
         uses: ./.github/workflows/env-setup
       - run: echo "Done!"

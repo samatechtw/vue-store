@@ -10,6 +10,10 @@ jobs:
     name: Environment Setup
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v2.2.1
         with:
           version: 6.32.3

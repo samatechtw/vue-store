@@ -1,5 +1,5 @@
 name: Environment Setup
-on: [push]
+on: ~
 jobs:
   setup-environment:
     runs-on: ubuntu-latest

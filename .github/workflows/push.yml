@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Checkout out repository code
         uses: actions/checkout@v2
-      - uses: ./.github/workflows/env-setup.yml
+      - uses: samatechtw/vue-store/.github/workflows/env-setup.yml
       - name: Check code format
         run: pnpm run format:check
 

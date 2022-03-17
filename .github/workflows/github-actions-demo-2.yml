@@ -4,11 +4,11 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code into workspace directory
+      - name: Checkout out repository code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: pnpm/action-setup@v2.2.1
         with:
           version: 6.29.1
       - name: Set up NodeJS v16

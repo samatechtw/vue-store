@@ -1,20 +1,8 @@
 name: GitHub Actions Demo 2
-on: [push]
+on: ~
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout out repository code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v2.2.1
-        with:
-          version: 6.32.3
-      - name: Set up NodeJS v16
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'pnpm'
-      - name: Install npm modules
-        run: pnpm install
+      -uses: ./.github/workflows/env-setup
+      -run: echo "Done!"

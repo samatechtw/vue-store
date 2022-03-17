@@ -1,18 +1,14 @@
 name: Environment Setup
-
-on:
-  workflow_call: ~
-
+on: [push]
 jobs:
-  checkout-and-install:
-    name: Checkout and Install
-    runs-on: ubuntu@latest
+  setup-environment:
+    runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
+      - name: Checkout out repository code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@latest
+      - uses: pnpm/action-setup@v2.2.1
         with:
           version: 6.32.3
       - name: Set up NodeJS v16

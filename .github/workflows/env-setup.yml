@@ -1,5 +1,6 @@
 name: Environment Setup
-on: ~
+on:
+  workflow_call: ~
 jobs:
   setup-environment:
     runs-on: ubuntu-latest

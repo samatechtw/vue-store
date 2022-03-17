@@ -6,8 +6,6 @@ jobs:
     name: Environment setup
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout out repository code
-        uses: actions/checkout@v2
       - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.1
         with:

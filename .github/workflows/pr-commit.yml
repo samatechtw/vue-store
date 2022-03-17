@@ -1,0 +1,46 @@
+name: PR Commit
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  prettier-format:
+    name: Prettier Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/env-setup
+      - name: Check code format
+        run: pnpm run format:check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/env-setup
+      - name: Lint source code
+        run: npm run lint
+      - name: Lint commits
+        run: npx commitlint --verbose --from=origin/main
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/env-setup
+      - name: Run unit tests
+        run: npm run test
+
+  build:
+    name: Build library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout out repository code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/env-setup
+      - name: Build library
+        run: npm run build

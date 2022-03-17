@@ -13,4 +13,5 @@ runs:
         node-version: '16'
         cache: 'pnpm'
     - name: Install npm modules
+      shell: bash
       run: pnpm install

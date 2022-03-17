@@ -1,0 +1,24 @@
+name: Environment Setup
+
+on:
+  workflow_call: ~
+
+jobs:
+  checkout-and-install:
+    name: Checkout and Install
+    runs-on: ubuntu@latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@latest
+        with:
+          version: 6.32.3
+      - name: Set up NodeJS v16
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'pnpm'
+      - name: Install npm modules
+        run: pnpm install

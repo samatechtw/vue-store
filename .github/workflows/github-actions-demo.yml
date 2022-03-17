@@ -1,17 +1,42 @@
-name: GitHub Actions Demo
-on: [push]
+name: PR Commit
+
+on:
+  pull_request:
+    branches: [main]
+env:
+  WORKSPACE_ROOT: .
+
 jobs:
-  Explore-GitHub-Actions:
+  prettier-format:
+    name: Prettier Format
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - uses: ./.github/workflows/env-setup
+      - name: Check code format
+        run: pnpm run format:check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/env-setup
+      - name: Lint source code
+        run: npm run lint
+      - name: Lint commits
+        run: npx commitlint --verbose --from=origin/main
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/env-setup
+      - name: Run unit tests
+        run: npm run test
+
+  build:
+    name: Build library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/env-setup
+      - name: Build library
+        run: npm run build

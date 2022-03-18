@@ -10,9 +10,11 @@ export interface ModuleInterface<
   mutations: M
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface State extends Record<string, any> {}
 
 export interface Getters<S extends State>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extends Record<string, (state: DeepReadonly<S>) => any> {}
 
 export type ComputedGetters<S extends State, G extends Getters<S>> = {
@@ -20,6 +22,7 @@ export type ComputedGetters<S extends State, G extends Getters<S>> = {
 }
 
 export interface Mutations<S extends State>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extends Record<string, (state: S) => (...args: Array<any>) => void> {}
 
 export type MappedMutations<S extends State, M extends Mutations<S>> = {

@@ -15,6 +15,7 @@ export interface StoreInterface<R extends ModuleRecord> {
   save: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ModuleRecord
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extends Record<string, ModuleInterface<any, Getters<any>, Mutations<any>>> {}

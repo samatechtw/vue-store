@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Lint source code
-        run: npm run lint
+        run: pnpm run lint
       - name: Lint commits
         run: npx commitlint --verbose --from=origin/main
 
@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Run unit tests
-        run: npm run test
+        run: pnpm run test
 
   build:
     name: Build library
@@ -51,4 +51,4 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Build library
-        run: npm run build
+        run: pnpm run build

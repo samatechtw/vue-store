@@ -1,7 +1,17 @@
-import { Module } from '@samatech/vue-store/lib'
-import { userModule } from './user'
+import {
+  IGetters,
+  IMutations,
+  IState,
+  ISubModules,
+  Module,
+} from '@samatech/vue-store/lib'
+import { IUserModule, userModule } from './user'
 
-const webRootModule = new Module({
+interface IWebSubModules extends ISubModules {
+  user: IUserModule
+}
+
+const webRootModule = new Module<IState, IGetters, IMutations, IWebSubModules>({
   name: 'web',
   version: 1,
   subModules: {

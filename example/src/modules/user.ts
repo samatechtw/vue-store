@@ -1,4 +1,4 @@
-import { IGetters, IMutations, IState, Module } from '@samatech/vue-store/lib'
+import { IGetters, IModule, IMutations, IState, Module } from '@samatech/vue-store/lib'
 
 interface IUser extends IState {
   id: number
@@ -16,12 +16,21 @@ interface IUserMutations extends IMutations {
   logout: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IUserModule
+  extends IModule<IUser, IUserGetters, IUserMutations, never> {}
+
 const getDefaultUser = (): IUser => ({
   id: 0,
   name: '',
 })
 
-export const userModule = new Module<IUser, IUserGetters, IUserMutations, never>({
+export const userModule: IUserModule = new Module<
+  IUser,
+  IUserGetters,
+  IUserMutations,
+  never
+>({
   name: 'user',
   version: 1,
   stateInit: getDefaultUser,

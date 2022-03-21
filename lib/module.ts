@@ -13,20 +13,20 @@ export interface IModule<
   S extends IState,
   G extends IGetters,
   M extends IMutations,
-  SM extends ISubModules,
+  SM extends ISubModules = never,
 > {
   readonly options: IModuleOptions<S, G, M, SM>
   flatten(): IFlattenedModule<S, G, M, SM>
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-interface */
-export interface ISubModules extends Record<string, IModule<any, any, any, any>> {}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type ISubModules = Record<string, IModule<any, any, any, any>>
 
-export interface IState extends Record<string, any> {}
+export type IState = Record<string, any>
 
-export interface IGetters extends Record<string, () => any> {}
+export type IGetters = Record<string, () => any>
 
-export interface IMutations extends Record<string, (...args: any) => void> {}
+export type IMutations = Record<string, (...args: any) => void>
 /* eslint-enable */
 
 export interface IModuleOptions<
@@ -47,7 +47,7 @@ export class Module<
   S extends IState,
   G extends IGetters,
   M extends IMutations,
-  SM extends ISubModules,
+  SM extends ISubModules = never,
 > implements IModule<S, G, M, SM>
 {
   constructor(public readonly options: IModuleOptions<S, G, M, SM>) {}
@@ -99,7 +99,7 @@ export class Module<
     return flattenedModule
   }
 
-  private getMetadata(): IFlattenedModuleMetadata {
+  private getMetadata(): IModuleMetadata {
     const { name, version } = this.options
     return {
       name,
@@ -108,14 +108,13 @@ export class Module<
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IFlattenedModule<
   S extends IState,
   G extends IGetters,
   M extends IMutations,
   SM extends ISubModules,
 > = {
-  __metadata: IFlattenedModuleMetadata
+  __metadata: IModuleMetadata
 } & {
   [key in keyof S]: DeepReadonly<Ref<S[key]>>
 } & {
@@ -134,7 +133,7 @@ export interface ModuleDataForLocalStorage<S extends IState> {
   state: S
 }
 
-export interface IFlattenedModuleMetadata {
+export interface IModuleMetadata {
   name: string
   version: number
 }

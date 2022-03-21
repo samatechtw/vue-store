@@ -1,7 +1,6 @@
 import { IGetters, IModule, IMutations, IState, Module } from '../lib'
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ITestModule extends IModule<ITestState, ITestGetters, ITestMutations, never> {}
+type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
 
 interface ITestState extends IState {
   id: number
@@ -23,7 +22,7 @@ const getDefaultState = (): ITestState => ({
 })
 
 const makeTestModule = (): ITestModule =>
-  new Module<ITestState, ITestGetters, ITestMutations, never>({
+  new Module<ITestState, ITestGetters, ITestMutations>({
     name: 'test',
     version: 1,
     stateInit: getDefaultState,

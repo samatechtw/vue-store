@@ -1,4 +1,11 @@
-import { IGetters, IModule, IMutations, IState, Module } from '@samatech/vue-store/lib'
+import {
+  IGetters,
+  ILastPlugin,
+  IModule,
+  IMutations,
+  IState,
+  Module,
+} from '@samatech/vue-store/lib'
 
 export type IUserModule = IModule<IUser, IUserGetters, IUserMutations>
 
@@ -23,7 +30,20 @@ const getDefaultUser = (): IUser => ({
   name: '',
 })
 
-export const userModule = new Module<IUser, IUserGetters, IUserMutations>({
+const localStoragePlugin: ILastPlugin<IUser> = {
+  onStateInit: (state) => {
+    const stringifiedState = localStorage.getItem('user')
+    if (!stringifiedState) {
+      return state as IUser
+    }
+    return JSON.parse(stringifiedState) as IUser
+  },
+  onDataChange: (value) => {
+    localStorage.setItem('user', JSON.stringify(value))
+  },
+}
+
+export const userModule = new Module<IUser, IUserGetters, IUserMutations, never>({
   name: 'user',
   version: 1,
   stateInit: getDefaultUser,
@@ -41,4 +61,5 @@ export const userModule = new Module<IUser, IUserGetters, IUserMutations>({
       Object.assign(state, getDefaultUser())
     },
   }),
+  plugins: [localStoragePlugin],
 })

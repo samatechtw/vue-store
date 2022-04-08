@@ -57,7 +57,7 @@ const handleLoginClick = () => {
   })
 }
 
-// these things are just here for the demonstration of updateName function
+// Demonstrate the updateName function
 const customName = ref(name.value)
 
 watch(name, (value) => (customName.value = value))

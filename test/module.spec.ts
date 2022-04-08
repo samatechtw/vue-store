@@ -1,4 +1,4 @@
-import { IGetters, IModule, IMutations, IState, Module } from '../lib'
+import { IGetters, IModule, IMutations, IPlugins, IState, Module } from '../lib'
 
 type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
 
@@ -21,7 +21,7 @@ const getDefaultState = (): ITestState => ({
   name: '',
 })
 
-const makeTestModule = (): ITestModule =>
+const makeTestModule = (plugins?: IPlugins<ITestState>): ITestModule =>
   new Module<ITestState, ITestGetters, ITestMutations>({
     name: 'test',
     version: 1,
@@ -37,6 +37,7 @@ const makeTestModule = (): ITestModule =>
         Object.assign(state, getDefaultState())
       },
     }),
+    plugins,
   })
 
 const makeRootModule = () =>
@@ -114,5 +115,67 @@ describe('vue-store', () => {
     const value = 'test'
     test.updateName(value)
     expect(test.name.value).toBe(value)
+  })
+
+  it('mutate state in the onStateInit hooks of plugins', async () => {
+    const [newId, newName] = [123, 'abc']
+    const module = makeTestModule([
+      {
+        onStateInit: (state) => {
+          state.id = newId
+          return state
+        },
+      },
+      {
+        onStateInit: (state) => {
+          state.name = newName
+          return state as ITestState
+        },
+      },
+    ]).flatten()
+    expect(module.id.value).toBe(newId)
+    expect(module.name.value).toBe(newName)
+  })
+
+  it('mutate state in the onStateInit hooks of plugins', () => {
+    const module = makeTestModule([
+      {
+        onStateInit: (state) => {
+          state.id = 100
+          return state
+        },
+      },
+      {
+        onStateInit: (state) => {
+          if (state.id !== undefined) {
+            state.id += 23
+          }
+          return state as ITestState
+        },
+      },
+    ]).flatten()
+    expect(module.id.value).toBe(123)
+  })
+
+  it('save JSON state to localStorage in the onDataChange hook of a plugin', async () => {
+    const KEY = 'vue-store-test'
+    const module = makeTestModule([
+      {
+        onDataChange: (value) => {
+          localStorage.setItem(KEY, JSON.stringify(value))
+        },
+      },
+    ]).flatten()
+    const newName = 'vue-store'
+    module.updateName(newName)
+    // a workaround to wait until the Vue watch-effect is done
+    await new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId)
+        return resolve(true)
+      }, 1)
+    })
+    const storedState: ITestState = JSON.parse(localStorage.getItem(KEY) ?? '')
+    expect(storedState.name).toBe(newName)
   })
 })

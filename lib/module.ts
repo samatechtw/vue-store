@@ -1,4 +1,4 @@
-import { computed, reactive, readonly, toRef, UnwrapNestedRefs } from 'vue'
+import { computed, reactive, readonly, toRef, UnwrapNestedRefs, watch } from 'vue'
 import {
   IFlattenedModule,
   IGetters,
@@ -6,6 +6,7 @@ import {
   IModuleMetadata,
   IModuleOptions,
   IMutations,
+  IPlugins,
   IState,
   ISubModules,
 } from './interfaces'
@@ -15,9 +16,10 @@ export class Module<
   G extends IGetters,
   M extends IMutations,
   SM extends ISubModules = never,
-> implements IModule<S, G, M, SM>
+  P extends IPlugins<S> = IPlugins<S>,
+> implements IModule<S, G, M, SM, P>
 {
-  constructor(public readonly options: IModuleOptions<S, G, M, SM>) {}
+  constructor(public readonly options: IModuleOptions<S, G, M, SM, P>) {}
 
   flatten(): IFlattenedModule<S, G, M, SM> {
     const flattenedModule = {} as IFlattenedModule<S, G, M, SM>
@@ -26,7 +28,8 @@ export class Module<
     flattenedModule.__metadata = this.getMetadata()
 
     // state
-    const state = reactive(this.options.stateInit?.() ?? ({} as S))
+    const initialState = this.getInitialState()
+    const state = reactive(initialState ?? ({} as S))
 
     // map state properties to Ref<T>
     for (const key in state) {
@@ -65,7 +68,43 @@ export class Module<
       flattenedModule[key] = subModules[key].flatten()
     }
 
+    // plugins
+    this.registerOnDataChangeHooks(state)
+
     return flattenedModule
+  }
+
+  private getInitialState(): S | undefined {
+    const { stateInit, plugins } = this.options
+    const source = stateInit?.()
+    if (!plugins?.length) {
+      return source
+    }
+    return plugins.reduce((state, plugin) => {
+      if (plugin.onStateInit) {
+        return plugin.onStateInit(state ?? {}) as S
+      }
+      return state
+    }, source)
+  }
+
+  private registerOnDataChangeHooks(state: UnwrapNestedRefs<S>): void {
+    const onDataChangeHooks = this.options.plugins
+      ?.filter((x) => x.onDataChange !== undefined)
+      .map((x) => x.onDataChange)
+    if (onDataChangeHooks?.length) {
+      watch(
+        state,
+        (value, oldValue, onCleanup) => {
+          onDataChangeHooks.forEach((callback) =>
+            callback?.(value, oldValue as NonNullable<typeof oldValue>, onCleanup),
+          )
+        },
+        {
+          immediate: true,
+        },
+      )
+    }
   }
 
   private getMetadata(): IModuleMetadata {

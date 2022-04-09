@@ -1,56 +1,25 @@
+import { computed, reactive, readonly, toRef, UnwrapNestedRefs, watch } from 'vue'
 import {
-  computed,
-  ComputedRef,
-  DeepReadonly,
-  reactive,
-  readonly,
-  Ref,
-  toRef,
-  UnwrapNestedRefs,
-} from 'vue'
-
-export interface IModule<
-  S extends IState,
-  G extends IGetters,
-  M extends IMutations,
-  SM extends ISubModules = never,
-> {
-  readonly options: IModuleOptions<S, G, M, SM>
-  flatten(): IFlattenedModule<S, G, M, SM>
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export type ISubModules = Record<string, IModule<any, any, any, any>>
-
-export type IState = Record<string, any>
-
-export type IGetters = Record<string, () => any>
-
-export type IMutations = Record<string, (...args: any) => void>
-/* eslint-enable */
-
-export interface IModuleOptions<
-  S extends IState,
-  G extends IGetters,
-  M extends IMutations,
-  SM extends ISubModules,
-> {
-  name: string
-  version: number
-  stateInit?: () => S
-  getters?: (state: S) => G
-  mutations?: (state: S) => M
-  subModules?: SM
-}
+  IFlattenedModule,
+  IGetters,
+  IModule,
+  IModuleMetadata,
+  IModuleOptions,
+  IMutations,
+  IPlugins,
+  IState,
+  ISubModules,
+} from './interfaces'
 
 export class Module<
   S extends IState,
   G extends IGetters,
   M extends IMutations,
   SM extends ISubModules = never,
-> implements IModule<S, G, M, SM>
+  P extends IPlugins<S> = IPlugins<S>,
+> implements IModule<S, G, M, SM, P>
 {
-  constructor(public readonly options: IModuleOptions<S, G, M, SM>) {}
+  constructor(public readonly options: IModuleOptions<S, G, M, SM, P>) {}
 
   flatten(): IFlattenedModule<S, G, M, SM> {
     const flattenedModule = {} as IFlattenedModule<S, G, M, SM>
@@ -59,7 +28,10 @@ export class Module<
     flattenedModule.__metadata = this.getMetadata()
 
     // state
-    const state = reactive(this.options.stateInit?.() ?? ({} as S))
+    const initialState = this.getInitialState()
+    const state = reactive(initialState ?? ({} as S))
+
+    // map state properties to Ref<T>
     for (const key in state) {
       // TODO: find the correct typing for this
       flattenedModule[key] = readonly(toRef(state, key)) as IFlattenedModule<
@@ -96,7 +68,43 @@ export class Module<
       flattenedModule[key] = subModules[key].flatten()
     }
 
+    // plugins
+    this.registerOnDataChangeHooks(state)
+
     return flattenedModule
+  }
+
+  private getInitialState(): S | undefined {
+    const { stateInit, plugins } = this.options
+    const source = stateInit?.()
+    if (!plugins?.length) {
+      return source
+    }
+    return plugins.reduce((state, plugin) => {
+      if (plugin.onStateInit) {
+        return plugin.onStateInit(state ?? {}) as S
+      }
+      return state
+    }, source)
+  }
+
+  private registerOnDataChangeHooks(state: UnwrapNestedRefs<S>): void {
+    const onDataChangeHooks = this.options.plugins
+      ?.filter((x) => x.onDataChange !== undefined)
+      .map((x) => x.onDataChange)
+    if (onDataChangeHooks?.length) {
+      watch(
+        state,
+        (value, oldValue, onCleanup) => {
+          onDataChangeHooks.forEach((callback) =>
+            callback?.(value, oldValue as NonNullable<typeof oldValue>, onCleanup),
+          )
+        },
+        {
+          immediate: true,
+        },
+      )
+    }
   }
 
   private getMetadata(): IModuleMetadata {
@@ -106,34 +114,4 @@ export class Module<
       version,
     }
   }
-}
-
-export type IFlattenedModule<
-  S extends IState,
-  G extends IGetters,
-  M extends IMutations,
-  SM extends ISubModules,
-> = {
-  __metadata: IModuleMetadata
-} & {
-  [key in keyof S]: DeepReadonly<Ref<S[key]>>
-} & {
-  [key in keyof G]: ComputedRef<ReturnType<G[key]>>
-} & M & {
-    [key in keyof NonNullable<SM>]: IFlattenedModule<
-      ReturnType<NonNullable<NonNullable<SM>[key]['options']['stateInit']>>,
-      ReturnType<NonNullable<NonNullable<SM>[key]['options']['getters']>>,
-      ReturnType<NonNullable<NonNullable<SM>[key]['options']['mutations']>>,
-      ReturnType<NonNullable<NonNullable<SM>[key]['options']['subModules']>>
-    >
-  }
-
-export interface ModuleDataForLocalStorage<S extends IState> {
-  version: number
-  state: S
-}
-
-export interface IModuleMetadata {
-  name: string
-  version: number
 }

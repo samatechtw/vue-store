@@ -27,7 +27,7 @@ export type IPlugins<S extends IState> = [
 
 export interface IPlugin<S extends IState> {
   onStateInit?: (state: Partial<S>) => Partial<S>
-  onDataChange?: WatchCallback<UnwrapNestedRefs<S>, UnwrapNestedRefs<S> | undefined>
+  onDataChange?: WatchCallback<UnwrapNestedRefs<S>, UnwrapNestedRefs<S>>
 }
 
 export interface ILastPlugin<S extends IState> extends Omit<IPlugin<S>, 'onStateInit'> {

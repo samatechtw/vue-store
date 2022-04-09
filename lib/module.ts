@@ -96,7 +96,9 @@ export class Module<
       watch(
         state,
         (value, oldValue, onCleanup) => {
-          onDataChangeHooks.forEach((callback) => callback?.(value, oldValue, onCleanup))
+          onDataChangeHooks.forEach((callback) =>
+            callback?.(value, oldValue as NonNullable<typeof oldValue>, onCleanup),
+          )
         },
         {
           immediate: true,

@@ -1,4 +1,4 @@
-import { IGetters, IModule, IMutations, IPlugins, IState, Module } from '../lib'
+import { IGetters, IModule, IMutations, IPlugin, IState, Module } from '../lib'
 
 type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
 
@@ -21,7 +21,7 @@ const getDefaultState = (): ITestState => ({
   name: '',
 })
 
-const makeTestModule = (plugins?: IPlugins<ITestState>): ITestModule =>
+const makeTestModule = (plugins?: IPlugin<ITestState>[]): ITestModule =>
   new Module<ITestState, ITestGetters, ITestMutations>({
     name: 'test',
     version: 1,

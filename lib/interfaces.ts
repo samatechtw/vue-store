@@ -5,14 +5,13 @@ export interface IModule<
   G extends IGetters,
   M extends IMutations,
   SM extends ISubModules = never,
-  P extends IPlugins<S> = IPlugins<S>,
 > {
-  readonly options: IModuleOptions<S, G, M, SM, P>
+  readonly options: IModuleOptions<S, G, M, SM>
   flatten(): IFlattenedModule<S, G, M, SM>
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type ISubModules = Record<string, IModule<any, any, any, any, any>>
+export type ISubModules = Record<string, IModule<any, any, any, any>>
 
 export type IState = Record<string, any>
 
@@ -20,18 +19,9 @@ export type IGetters = Record<string, () => any>
 
 export type IMutations = Record<string, (...args: any) => void>
 
-export type IPlugins<S extends IState> = [
-  ...plugins: Array<IPlugin<S>>,
-  lastPlugin: ILastPlugin<S>,
-]
-
 export interface IPlugin<S extends IState> {
-  onStateInit?: (state: Partial<S>) => Partial<S>
+  onStateInit?: (state: S) => S
   onDataChange?: WatchCallback<UnwrapNestedRefs<S>, UnwrapNestedRefs<S>>
-}
-
-export interface ILastPlugin<S extends IState> extends Omit<IPlugin<S>, 'onStateInit'> {
-  onStateInit?: (state: Partial<S>) => S
 }
 /* eslint-enable */
 
@@ -40,14 +30,13 @@ export interface IModuleOptions<
   G extends IGetters,
   M extends IMutations,
   SM extends ISubModules,
-  P extends IPlugins<S>,
 > {
   name: string
   version: number
   stateInit?: () => S
   getters?: (state: S) => G
   mutations?: (state: S) => M
-  plugins?: P
+  plugins?: IPlugin<S>[]
   subModules?: SM
 }
 

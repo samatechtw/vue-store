@@ -1,9 +1,9 @@
 import {
   IGetters,
-  ILastPlugin,
   IModule,
   IMutations,
   IState,
+  IPlugin,
   Module,
 } from '@samatech/vue-store/lib'
 
@@ -30,13 +30,13 @@ const getDefaultUser = (): IUser => ({
   name: '',
 })
 
-const localStoragePlugin: ILastPlugin<IUser> = {
+const localStoragePlugin: IPlugin<IUser> = {
   onStateInit: (state) => {
     const stringifiedState = localStorage.getItem('user')
     if (!stringifiedState) {
-      return state as IUser
+      return state
     }
-    return JSON.parse(stringifiedState) as IUser
+    return JSON.parse(stringifiedState)
   },
   onDataChange: (value) => {
     localStorage.setItem('user', JSON.stringify(value))

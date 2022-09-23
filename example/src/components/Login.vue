@@ -60,7 +60,10 @@ const handleLoginClick = () => {
 // Demonstrate the updateName function
 const customName = ref(name.value)
 
-watch(name, (value) => (customName.value = value))
+watch(
+  () => name.value,
+  (value) => (customName.value = value),
+)
 
 const handleFormSubmit = () => {
   updateName(customName.value)

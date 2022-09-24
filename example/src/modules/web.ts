@@ -1,22 +1,10 @@
-import {
-  IGetters,
-  IMutations,
-  IState,
-  ISubModules,
-  Module,
-} from '@samatech/vue-store/lib'
-import { IUserModule, userModule } from './user'
+import { useRootModule } from '@samatech/vue-store/lib'
+import { userModule } from './user'
 
-interface IWebSubModules extends ISubModules {
-  user: IUserModule
-}
-
-const webRootModule = new Module<IState, IGetters, IMutations, IWebSubModules>({
+export const webModule = useRootModule({
   name: 'web',
   version: 1,
   subModules: {
     user: userModule,
   },
 })
-
-export const webModule = webRootModule.flatten()

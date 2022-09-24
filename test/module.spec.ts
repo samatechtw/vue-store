@@ -1,4 +1,14 @@
-import { IGetters, IModule, IMutations, IPlugin, IState, Module } from '../lib'
+import {
+  ICreatePlugin,
+  IGetters,
+  IModule,
+  IMutations,
+  IPlugin,
+  IState,
+  LocalStoragePlugin,
+  Module,
+  useRootModule,
+} from '../lib'
 
 type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
 
@@ -21,7 +31,9 @@ const getDefaultState = (): ITestState => ({
   name: '',
 })
 
-const makeTestModule = (plugins?: IPlugin<ITestState>[]): ITestModule =>
+const makeTestModule = (
+  plugins?: (ICreatePlugin<ITestState> | IPlugin<ITestState>)[],
+): ITestModule =>
   new Module<ITestState, ITestGetters, ITestMutations>({
     name: 'test',
     version: 1,
@@ -117,6 +129,19 @@ describe('vue-store', () => {
     expect(test.name.value).toBe(value)
   })
 
+  it('uses composable helpers to create modules', () => {
+    const value = 'test'
+    const root = useRootModule({
+      name: 'root',
+      version: 1,
+      subModules: {
+        test: makeTestModule(),
+      },
+    })
+    root.test.updateName(value)
+    expect(root.test.name.value).toBe(value)
+  })
+
   it('mutate state in the onStateInit hooks of plugins', async () => {
     const [newId, newName] = [123, 'abc']
     const module = makeTestModule([
@@ -129,7 +154,7 @@ describe('vue-store', () => {
       {
         onStateInit: (state) => {
           state.name = newName
-          return state as ITestState
+          return state
         },
       },
     ]).flatten()
@@ -177,5 +202,28 @@ describe('vue-store', () => {
     })
     const storedState: ITestState = JSON.parse(localStorage.getItem(KEY) ?? '')
     expect(storedState.name).toBe(newName)
+  })
+
+  it('modify state and save with builtin local storage plugin', async () => {
+    const module = makeTestModule([
+      {
+        onDataChange: (value) => {
+          value.id += 1
+        },
+      },
+      LocalStoragePlugin,
+    ]).flatten()
+    const newName = 'vue-store'
+    module.updateName(newName)
+    // a workaround to wait until the Vue watch-effect is done
+    await new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId)
+        return resolve(true)
+      }, 1)
+    })
+    const storedState: ITestState = JSON.parse(localStorage.getItem('test') ?? '')
+    expect(storedState.name).toBe(newName)
+    expect(storedState.id).toBe(1)
   })
 })

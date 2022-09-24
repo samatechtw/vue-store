@@ -1,4 +1,4 @@
-import { computed, reactive, readonly, toRef, UnwrapNestedRefs, watch } from 'vue'
+import { computed, reactive, readonly, toRaw, toRef, UnwrapNestedRefs, watch } from 'vue'
 import {
   IFlattenedModule,
   IGetters,
@@ -6,9 +6,26 @@ import {
   IModuleMetadata,
   IModuleOptions,
   IMutations,
+  IPlugin,
   IState,
   ISubModules,
 } from './interfaces'
+
+export function useModule<
+  S extends IState,
+  G extends IGetters,
+  M extends IMutations,
+  SM extends ISubModules = never,
+>(options: IModuleOptions<S, G, M, SM>): IModule<S, G, M, SM> {
+  return new Module<S, G, M, SM>(options)
+}
+
+export function useRootModule<SM extends ISubModules>(
+  options: IModuleOptions<IState, IGetters, IMutations, SM>,
+): IFlattenedModule<IState, IGetters, IMutations, SM> {
+  const module = new Module<IState, IGetters, IMutations, SM>(options)
+  return module.flatten()
+}
 
 export class Module<
   S extends IState,
@@ -17,7 +34,16 @@ export class Module<
   SM extends ISubModules = never,
 > implements IModule<S, G, M, SM>
 {
-  constructor(public readonly options: IModuleOptions<S, G, M, SM>) {}
+  plugins?: IPlugin<S>[]
+
+  constructor(public readonly options: IModuleOptions<S, G, M, SM>) {
+    this.plugins = options.plugins?.map((pluginInit) => {
+      if (typeof pluginInit === 'function') {
+        return pluginInit(this)
+      }
+      return pluginInit
+    })
+  }
 
   flatten(): IFlattenedModule<S, G, M, SM> {
     const flattenedModule = {} as IFlattenedModule<S, G, M, SM>
@@ -72,12 +98,12 @@ export class Module<
   }
 
   private getInitialState(): S {
-    const { stateInit, plugins } = this.options
+    const { stateInit } = this.options
     const source = stateInit?.() ?? ({} as S)
-    if (!plugins?.length) {
+    if (!this.plugins?.length) {
       return source
     }
-    return plugins.reduce((state, plugin) => {
+    return this.plugins.reduce((state, plugin) => {
       if (plugin.onStateInit) {
         return plugin.onStateInit(state)
       }
@@ -86,21 +112,16 @@ export class Module<
   }
 
   private registerOnDataChangeHooks(state: UnwrapNestedRefs<S>): void {
-    const onDataChangeHooks = this.options.plugins
+    const onDataChangeHooks = this.plugins
       ?.filter((plugin) => plugin.onDataChange !== undefined)
       .map((plugin) => plugin.onDataChange)
     if (onDataChangeHooks?.length) {
-      watch(
-        state,
-        (value, oldValue, onCleanup) => {
-          onDataChangeHooks.forEach((callback) =>
-            callback?.(value, oldValue as NonNullable<typeof oldValue>, onCleanup),
-          )
-        },
-        {
-          immediate: true,
-        },
-      )
+      watch(state, (value, oldValue, onCleanup) => {
+        const rawState = toRaw(value)
+        for (const dataChangeHook of onDataChangeHooks) {
+          dataChangeHook?.(rawState, oldValue, onCleanup)
+        }
+      })
     }
   }
 

@@ -11,7 +11,9 @@ export interface IModule<
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type ISubModules = Record<string, IModule<any, any, any, any>>
+export interface ISubModules {
+  [key: string]: IModule<any, any, any, any>
+}
 
 export type IState = Record<string, any>
 
@@ -21,9 +23,17 @@ export type IMutations = Record<string, (...args: any) => void>
 
 export interface IPlugin<S extends IState> {
   onStateInit?: (state: S) => S
-  onDataChange?: WatchCallback<UnwrapNestedRefs<S>, UnwrapNestedRefs<S>>
+  onDataChange?: WatchCallback<UnwrapNestedRefs<S>, UnwrapNestedRefs<S> | undefined>
 }
 /* eslint-enable */
+
+export type IGenericModule<S extends IState = IState> = IModule<
+  S,
+  IGetters,
+  IMutations,
+  ISubModules
+>
+export type ICreatePlugin<S extends IState> = (module: IGenericModule<S>) => IPlugin<S>
 
 export interface IModuleOptions<
   S extends IState,
@@ -36,7 +46,7 @@ export interface IModuleOptions<
   stateInit?: () => S
   getters?: (state: S) => G
   mutations?: (state: S) => M
-  plugins?: IPlugin<S>[]
+  plugins?: (ICreatePlugin<S> | IPlugin<S>)[]
   subModules?: SM
 }
 
@@ -44,7 +54,7 @@ export type IFlattenedModule<
   S extends IState,
   G extends IGetters,
   M extends IMutations,
-  SM extends ISubModules,
+  SM extends ISubModules = never,
 > = {
   __metadata: IModuleMetadata
 } & {

@@ -24,52 +24,13 @@ pnpm i -S @samatech/vue-store
 
 ### Usage
 
-Typings can be inferred when initializing modules:
-
-```ts
-import { LocalStoragePlugin, useModule, useRootModule } from '@samatech/vue-store'
-
-interface IUser {
-  name: string
-}
-
-const getDefaultUser = (): IUser => ({
-  name: '',
-})
-
-const userModule = useModule({
-  name: 'user-store',
-  version: 1,
-  stateInit: getDefaultUser,
-  getters: (state: IUser) => ({
-    upperCaseName: () => state.name.toUpperCase(),
-  }),
-  mutations: (state: IUser) => ({
-    updateName: (name: string) => (state.name = name),
-    logout: () => {
-      Object.assign(state, getDefaultUser())
-    },
-  }),
-  plugins: [LocalStoragePlugin],
-})
-
-export default store = useRootModule({
-  name: 'web-store',
-  version: 1,
-  subModules: {
-    user: userModule,
-  },
-})
-```
-
-Explicit typing:
+A basic module with explicit typing. See [here](./example/src/modules/web.ts) for a slightly more advanced example.
 
 ```ts
 import {
   IGetters,
   IMutations,
   IState,
-  IPlugin,
   useModule,
   IModule,
   LocalStoragePlugin,
@@ -110,6 +71,54 @@ export const userModule = useModule<IUser, IUserGetters, IUserMutations>({
   plugins: [LocalStoragePlugin],
 })
 ```
+
+Typescript's `ReturnType` feature can be used to avoid the need for defining explicit interfaces:
+
+```ts
+import { LocalStoragePlugin, useModule, useRootModule } from '@samatech/vue-store'
+
+interface IUser {
+  name: string
+}
+
+const getDefaultUser = (): IUser => ({
+  name: '',
+})
+
+const getters = (state: IUser) => ({
+  upperCaseName: () => state.name.toUpperCase(),
+})
+
+const mutations = (state: IUser) => ({
+  updateName: (name: string) => (state.name = name),
+  logout: () => {
+    Object.assign(state, getDefaultUser())
+  },
+})
+
+const userModule = useModule<
+  IUser,
+  ReturnType<typeof getters>,
+  ReturnType<typeof mutations>
+>({
+  name: 'user-store',
+  version: 1,
+  stateInit: getDefaultUser,
+  getters,
+  mutations,
+  plugins: [LocalStoragePlugin],
+})
+
+export const store = useRootModule({
+  name: 'web-store',
+  version: 1,
+  subModules: {
+    user: userModule,
+  },
+})
+```
+
+Explicit typing:
 
 ### Plugins
 

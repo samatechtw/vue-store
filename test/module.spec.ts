@@ -6,6 +6,7 @@ import {
   IPlugin,
   IState,
   LocalStoragePlugin,
+  ILocalStoragePluginState,
   Module,
   useRootModule,
 } from '../lib'
@@ -222,8 +223,11 @@ describe('vue-store', () => {
         return resolve(true)
       }, 1)
     })
-    const storedState: ITestState = JSON.parse(localStorage.getItem('test') ?? '')
-    expect(storedState.name).toBe(newName)
-    expect(storedState.id).toBe(1)
+    const storedState: ILocalStoragePluginState<ITestState> = JSON.parse(
+      localStorage.getItem('test') ?? '',
+    )
+    expect(storedState.state.name).toBe(newName)
+    expect(storedState.state.id).toBe(1)
+    expect(storedState.__version).toBe(1)
   })
 })

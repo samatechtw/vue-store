@@ -1,6 +1,6 @@
 import { IGenericModule, IPlugin, IState } from './interfaces'
 
-interface ILocalStoragePluginState<S extends IState> {
+export interface ILocalStoragePluginState<S extends IState> {
   state: S
   __version: number
 }
@@ -10,15 +10,16 @@ export const LocalStoragePlugin = <S extends IState>(
 ): IPlugin<S> => {
   return {
     onStateInit: (state: S) => {
-      const stateString = localStorage.getItem(module.options.name)
+      const { name, version } = module.options
+      const stateString = localStorage.getItem(name)
       if (!stateString) {
         return state
       }
       const payload = JSON.parse(stateString) as ILocalStoragePluginState<S>
-      if (payload.__version !== module.options.version) {
+      if (payload.__version !== version) {
         console.warn(
-          // eslint-disable-next-line max-len
-          `Module with name '${module.options.name}' changed from ${payload.__version} to ${module.options.version}. The state has been reset.`,
+          `Upgrade module '${name}' from ${payload.__version} to ${version}.\n` +
+            'The state has been reset.',
         )
         return state
       }

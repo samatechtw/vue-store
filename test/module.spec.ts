@@ -8,7 +8,7 @@ import {
   LocalStoragePlugin,
   ILocalStoragePluginState,
   Module,
-  useRootModule,
+  useModule,
 } from '../lib'
 
 type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
@@ -53,15 +53,6 @@ const makeTestModule = (
     plugins,
   })
 
-const makeRootModule = () =>
-  new Module<IState, IGetters, IMutations, { test: ITestModule }>({
-    name: 'root',
-    version: 1,
-    subModules: {
-      test: makeTestModule(),
-    },
-  })
-
 describe('vue-store', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -103,44 +94,14 @@ describe('vue-store', () => {
     expect(flattenedTestModule.name.value).toBe(name)
   })
 
-  it('creates a sub-module', () => {
-    const { name, version } = makeRootModule().flatten().__metadata
-    expect(name).toBeTruthy()
-    expect(version).toBeTruthy()
-  })
-
-  it('accesses flattened sub-module states', () => {
-    const rootModule = makeRootModule()
-    const defaultSubModuleState =
-      rootModule.options.subModules?.test.options.stateInit?.()
-    const { test } = rootModule.flatten()
-    expect(test.id.value).toBe(defaultSubModuleState?.id)
-    expect(test.name.value).toBe(defaultSubModuleState?.name)
-  })
-
-  it('calls flattened sub-module getters', () => {
-    const { test } = makeRootModule().flatten()
-    expect(test.isDefault.value).toBe(true)
-  })
-
-  it('calls flattened sub-module mutations', () => {
-    const { test } = makeRootModule().flatten()
-    const value = 'test'
-    test.updateName(value)
-    expect(test.name.value).toBe(value)
-  })
-
   it('uses composable helpers to create modules', () => {
     const value = 'test'
-    const root = useRootModule({
+    const root = useModule({
+      ...makeTestModule().options,
       name: 'root',
-      version: 1,
-      subModules: {
-        test: makeTestModule(),
-      },
     })
-    root.test.updateName(value)
-    expect(root.test.name.value).toBe(value)
+    root.updateName(value)
+    expect(root.name.value).toBe(value)
   })
 
   it('mutate state in the onStateInit hooks of plugins', async () => {

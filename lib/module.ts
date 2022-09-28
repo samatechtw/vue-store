@@ -8,35 +8,21 @@ import {
   IMutations,
   IPlugin,
   IState,
-  ISubModules,
 } from './interfaces'
 
-export function useModule<
-  S extends IState,
-  G extends IGetters,
-  M extends IMutations,
-  SM extends ISubModules = never,
->(options: IModuleOptions<S, G, M, SM>): IModule<S, G, M, SM> {
-  return new Module<S, G, M, SM>(options)
-}
-
-export function useRootModule<SM extends ISubModules>(
-  options: IModuleOptions<IState, IGetters, IMutations, SM>,
-): IFlattenedModule<IState, IGetters, IMutations, SM> {
-  const module = new Module<IState, IGetters, IMutations, SM>(options)
+export function useModule<S extends IState, G extends IGetters, M extends IMutations>(
+  options: IModuleOptions<S, G, M>,
+): IFlattenedModule<S, G, M> {
+  const module = new Module<S, G, M>(options)
   return module.flatten()
 }
 
-export class Module<
-  S extends IState,
-  G extends IGetters,
-  M extends IMutations,
-  SM extends ISubModules = never,
-> implements IModule<S, G, M, SM>
+export class Module<S extends IState, G extends IGetters, M extends IMutations>
+  implements IModule<S, G, M>
 {
   plugins?: IPlugin<S>[]
 
-  constructor(public readonly options: IModuleOptions<S, G, M, SM>) {
+  constructor(public readonly options: IModuleOptions<S, G, M>) {
     this.plugins = options.plugins?.map((pluginInit) => {
       if (typeof pluginInit === 'function') {
         return pluginInit(this)
@@ -45,8 +31,8 @@ export class Module<
     })
   }
 
-  flatten(): IFlattenedModule<S, G, M, SM> {
-    const flattenedModule = {} as IFlattenedModule<S, G, M, SM>
+  flatten(): IFlattenedModule<S, G, M> {
+    const flattenedModule = {} as IFlattenedModule<S, G, M>
 
     // metadata
     flattenedModule.__metadata = this.getMetadata()
@@ -57,38 +43,29 @@ export class Module<
 
     // map state properties to Ref<T>
     for (const key in state) {
-      // TODO: find the correct typing for this
       flattenedModule[key] = readonly(toRef(state, key)) as IFlattenedModule<
         S,
         G,
-        M,
-        SM
-      >['string']
+        M
+      >[Extract<keyof UnwrapNestedRefs<S>, string>]
     }
 
     // getters
     const getters = this.options.getters?.(state) ?? ({} as G)
     for (const key in getters) {
-      // TODO: find the correct typing for this
-      flattenedModule[key] = computed(getters[key]) as IFlattenedModule<
-        S,
-        G,
-        M,
-        SM
-      >['string']
+      flattenedModule[key] = computed(getters[key]) as IFlattenedModule<S, G, M>[Extract<
+        keyof G,
+        string
+      >]
     }
 
     // mutations
     const mutations = this.options.mutations?.(state) ?? ({} as M)
     for (const key in mutations) {
-      // TODO: find the correct typing for this
-      flattenedModule[key] = mutations[key] as IFlattenedModule<S, G, M, SM>['string']
-    }
-
-    // subModules
-    const subModules = this.options.subModules ?? ({} as SM)
-    for (const key in subModules) {
-      flattenedModule[key] = subModules[key].flatten()
+      flattenedModule[key] = mutations[key] as IFlattenedModule<S, G, M>[Extract<
+        keyof M,
+        string
+      >]
     }
 
     // plugins

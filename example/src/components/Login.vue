@@ -34,9 +34,8 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import { webModule } from '../modules/web'
+import { userModule } from '../modules/user'
 
-const { user } = webModule
 const {
   // state
   id,
@@ -48,7 +47,7 @@ const {
   login,
   updateName,
   logout,
-} = user
+} = userModule
 
 const handleLoginClick = () => {
   login({

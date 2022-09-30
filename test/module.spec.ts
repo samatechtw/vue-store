@@ -7,7 +7,8 @@ import {
   IState,
   LocalStoragePlugin,
   ILocalStoragePluginState,
-  Module,
+  flatten,
+  createModule,
   useModule,
 } from '../lib'
 
@@ -35,7 +36,7 @@ const getDefaultState = (): ITestState => ({
 const makeTestModule = (
   plugins?: (ICreatePlugin<ITestState> | IPlugin<ITestState>)[],
 ): ITestModule =>
-  new Module<ITestState, ITestGetters, ITestMutations>({
+  createModule<ITestState, ITestGetters, ITestMutations>({
     name: 'test',
     version: 1,
     stateInit: getDefaultState,
@@ -69,26 +70,26 @@ describe('vue-store', () => {
   })
 
   it('creates a flattened module', () => {
-    const flattenedTestModule = makeTestModule().flatten()
+    const flattenedTestModule = flatten(makeTestModule())
     expect(flattenedTestModule.__metadata.name).toBeTruthy()
     expect(flattenedTestModule.__metadata.version).toBeTruthy()
   })
 
   it('accesses flattened module states', () => {
     const testModule = makeTestModule()
-    const flattenedTestModule = testModule.flatten()
+    const flattenedTestModule = flatten(testModule)
     const testModuleDefaultState = testModule.options.stateInit?.()
     expect(flattenedTestModule.id.value).toBe(testModuleDefaultState?.id)
     expect(flattenedTestModule.name.value).toBe(testModuleDefaultState?.name)
   })
 
   it('calls flattened module getters', () => {
-    const flattenedTestModule = makeTestModule().flatten()
+    const flattenedTestModule = flatten(makeTestModule())
     expect(flattenedTestModule.isDefault.value).toBe(true)
   })
 
   it('calls flattened module mutations', () => {
-    const flattenedTestModule = makeTestModule().flatten()
+    const flattenedTestModule = flatten(makeTestModule())
     const name = 'test'
     flattenedTestModule.updateName(name)
     expect(flattenedTestModule.name.value).toBe(name)
@@ -106,53 +107,59 @@ describe('vue-store', () => {
 
   it('mutate state in the onStateInit hooks of plugins', async () => {
     const [newId, newName] = [123, 'abc']
-    const module = makeTestModule([
-      {
-        onStateInit: (state) => {
-          state.id = newId
-          return state
+    const module = flatten(
+      makeTestModule([
+        {
+          onStateInit: (state) => {
+            state.id = newId
+            return state
+          },
         },
-      },
-      {
-        onStateInit: (state) => {
-          state.name = newName
-          return state
+        {
+          onStateInit: (state) => {
+            state.name = newName
+            return state
+          },
         },
-      },
-    ]).flatten()
+      ]),
+    )
     expect(module.id.value).toBe(newId)
     expect(module.name.value).toBe(newName)
   })
 
   it('mutate state in the onStateInit hooks of plugins', () => {
-    const module = makeTestModule([
-      {
-        onStateInit: (state) => {
-          state.id = 100
-          return state
+    const module = flatten(
+      makeTestModule([
+        {
+          onStateInit: (state) => {
+            state.id = 100
+            return state
+          },
         },
-      },
-      {
-        onStateInit: (state) => {
-          if (state.id !== undefined) {
-            state.id += 23
-          }
-          return state as ITestState
+        {
+          onStateInit: (state) => {
+            if (state.id !== undefined) {
+              state.id += 23
+            }
+            return state as ITestState
+          },
         },
-      },
-    ]).flatten()
+      ]),
+    )
     expect(module.id.value).toBe(123)
   })
 
   it('save JSON state to localStorage in the onDataChange hook of a plugin', async () => {
     const KEY = 'vue-store-test'
-    const module = makeTestModule([
-      {
-        onDataChange: (value) => {
-          localStorage.setItem(KEY, JSON.stringify(value))
+    const module = flatten(
+      makeTestModule([
+        {
+          onDataChange: (value) => {
+            localStorage.setItem(KEY, JSON.stringify(value))
+          },
         },
-      },
-    ]).flatten()
+      ]),
+    )
     const newName = 'vue-store'
     module.updateName(newName)
     // a workaround to wait until the Vue watch-effect is done
@@ -167,14 +174,16 @@ describe('vue-store', () => {
   })
 
   it('modify state and save with builtin local storage plugin', async () => {
-    const module = makeTestModule([
-      {
-        onDataChange: (value) => {
-          value.id += 1
+    const module = flatten(
+      makeTestModule([
+        {
+          onDataChange: (value) => {
+            value.id += 1
+          },
         },
-      },
-      LocalStoragePlugin,
-    ]).flatten()
+        LocalStoragePlugin,
+      ]),
+    )
     const newName = 'vue-store'
     module.updateName(newName)
     // a workaround to wait until the Vue watch-effect is done

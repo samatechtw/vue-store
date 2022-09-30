@@ -2,7 +2,7 @@ import { ComputedRef, DeepReadonly, Ref, UnwrapNestedRefs, WatchCallback } from 
 
 export interface IModule<S extends IState, G extends IGetters, M extends IMutations> {
   readonly options: IModuleOptions<S, G, M>
-  flatten(): IFlattenedModule<S, G, M>
+  plugins?: IPlugin<S>[]
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

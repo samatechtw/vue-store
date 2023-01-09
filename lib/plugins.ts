@@ -5,6 +5,21 @@ export interface ILocalStoragePluginState<S extends IState> {
   __version: number
 }
 
+const migrateState = <S extends IState>(oldState: IState, newState: S): S => {
+  const migratedState = {} as S
+
+  for (const key in newState) {
+    const [oldValue, newValue] = [oldState[key], newState[key]]
+    if (key in oldState && typeof oldValue === typeof newValue) {
+      migratedState[key as keyof S] = oldValue
+    } else {
+      migratedState[key as keyof S] = newValue
+    }
+  }
+
+  return migratedState
+}
+
 export const LocalStoragePlugin = <S extends IState>(
   module: IGenericModule<S>,
 ): IPlugin<S> => {
@@ -19,9 +34,9 @@ export const LocalStoragePlugin = <S extends IState>(
       if (payload.__version !== version) {
         console.warn(
           `Upgrade module '${name}' from ${payload.__version} to ${version}.\n` +
-            'The state has been reset.',
+            'States has been migrated',
         )
-        return state
+        return migrateState(payload.state, state)
       }
       return payload.state
     },

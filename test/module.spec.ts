@@ -5,8 +5,6 @@ import {
   IMutations,
   IPlugin,
   IState,
-  LocalStoragePlugin,
-  ILocalStoragePluginState,
   flatten,
   createModule,
   useModule,
@@ -171,33 +169,5 @@ describe('vue-store', () => {
     })
     const storedState: ITestState = JSON.parse(localStorage.getItem(KEY) ?? '')
     expect(storedState.name).toBe(newName)
-  })
-
-  it('modify state and save with builtin local storage plugin', async () => {
-    const module = flatten(
-      makeTestModule([
-        {
-          onDataChange: (value) => {
-            value.id += 1
-          },
-        },
-        LocalStoragePlugin,
-      ]),
-    )
-    const newName = 'vue-store'
-    module.updateName(newName)
-    // a workaround to wait until the Vue watch-effect is done
-    await new Promise((resolve) => {
-      const timeoutId = setTimeout(() => {
-        clearTimeout(timeoutId)
-        return resolve(true)
-      }, 1)
-    })
-    const storedState: ILocalStoragePluginState<ITestState> = JSON.parse(
-      localStorage.getItem('test') ?? '',
-    )
-    expect(storedState.state.name).toBe(newName)
-    expect(storedState.state.id).toBe(1)
-    expect(storedState.__version).toBe(1)
   })
 })

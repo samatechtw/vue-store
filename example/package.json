@@ -1,5 +1,5 @@
 {
-  "name": "vue-store-example",
+  "name": "@samatech/vue-store-example",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",

@@ -166,7 +166,7 @@ cd vue-store
 pnpm install
 
 # Run example
-pnpm run dev
+pnpm run all:dev
 
 # Build
 pnpm run build

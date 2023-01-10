@@ -37,7 +37,7 @@ const getOldDefaultState = (): IOldTestState => ({
 })
 
 const getNewDefaultState = (): INewTestState => ({
-  id: 0,
+  id: 999,
   age: 5,
 })
 
@@ -114,7 +114,8 @@ describe('vue-store plugins', () => {
       expect(oldTestModule.name.value).toEqual('')
 
       // Change state to trigger the save logic in LocalStoragePlugin
-      oldTestModule.updateId(1)
+      const newIdForOldModule = 123
+      oldTestModule.updateId(newIdForOldModule)
       // a workaround to wait until the Vue watch-effect is done
       await Promise.resolve()
 
@@ -127,15 +128,15 @@ describe('vue-store plugins', () => {
       )
 
       // `id` should remain the same, because this property exists in both old and new states
-      expect(newTestModule.id.value).toEqual(oldTestModule.id.value)
+      expect(newTestModule.id.value).toEqual(newIdForOldModule)
       // `age` should be set to default, because it only exists in the new state
       expect(newTestModule.age.value).toEqual(5)
       // `name` should be removed from the store, because it only exists in the old state
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((newTestModule as any).name).toBeUndefined()
+      expect('name' in newTestModule).toBe(false)
 
       // Change state to trigger the save logic in LocalStoragePlugin
-      newTestModule.updateId(2)
+      const newIdForNewModule = 456
+      newTestModule.updateId(newIdForNewModule)
       // a workaround to wait until the Vue watch-effect is done
       await Promise.resolve()
 
@@ -144,10 +145,9 @@ describe('vue-store plugins', () => {
         localStorage.getItem('test') ?? '',
       )
 
-      expect(storedState.state.id).toEqual(2)
+      expect(storedState.state.id).toEqual(newIdForNewModule)
       expect(storedState.state.age).toEqual(5)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((storedState.state as any).name).toBeUndefined()
+      expect('name' in storedState.state).toBe(false)
     })
   })
 })

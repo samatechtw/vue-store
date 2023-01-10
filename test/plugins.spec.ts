@@ -84,9 +84,9 @@ describe('vue-store plugins', () => {
       )
       expect(module.id.value).toEqual(0)
 
-      // Verify values in localStorage before anything changes
-      const stringifiedStateBefore = localStorage.getItem('test')
-      expect(stringifiedStateBefore).toBeNull()
+      // Verify default values in localStorage before anything changes
+      const stateBefore = JSON.parse(localStorage.getItem('test') || '')
+      expect(stateBefore.state.id).toEqual(0)
 
       // Update id
       const newId = 1

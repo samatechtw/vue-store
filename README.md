@@ -118,7 +118,9 @@ export const store = useRootModule({
 })
 ```
 
-Explicit typing:
+#### Undefined handling
+
+If a state field is set to `undefined`, it will not appear in the flattened module, or be saved with the LocalStoragePlugin. It is recommended to use `null` instead, and make use of strict type checking to avoid accidentally setting fields to `undefined`. It is possible to add `undefined` support to the LocalStoragePlugin, please file a feature request or submit a PR if you need this functionality.
 
 ### Plugins
 

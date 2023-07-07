@@ -8,6 +8,10 @@
     "lib",
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samatechtw/vue-store.git"
+  },
   "scripts": {
     "build": "rm -rf dist/* && tsc",
     "all:dev": "pnpm --stream --parallel --filter '*vue-store*' -w run dev",

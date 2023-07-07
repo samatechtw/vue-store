@@ -6,11 +6,11 @@ runs:
     - name: Setup PNPM
       uses: pnpm/action-setup@v2.2.4
       with:
-        version: 7.12.2
-    - name: Set up NodeJS v16
+        version: 8.6.6
+    - name: Set up NodeJS v18
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: 18
         registry-url: 'https://registry.npmjs.org'
         cache: 'pnpm'
     - name: Install npm modules

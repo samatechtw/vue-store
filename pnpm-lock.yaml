@@ -61,7 +61,7 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
       vite:
-        specifier: ^4.4.1
+        specifier: ^4.3.9
         version: 4.4.1(@types/node@18.14.6)
 
   example:

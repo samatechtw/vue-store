@@ -8,7 +8,7 @@ export interface IModule<S extends IState, G extends IGetters, M extends IMutati
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type IState = Record<string, any>
 
-export type IGetters = Record<string, () => any>
+export type IGetters = Record<string, (...args: any) => any>
 
 export type IMutations = Record<string, (...args: any) => void>
 /* eslint-enable */

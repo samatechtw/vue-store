@@ -1,9 +1,13 @@
 {
   "name": "@samatech/vue-store",
   "version": "0.5.0",
-  "main": "dist/index.mjs",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "exports": {
-    ".": "./dist/index.mjs"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
   "types": "dist/index.d.mts",
   "files": [
@@ -15,7 +19,7 @@
     "url": "git+https://github.com/samatechtw/vue-store.git"
   },
   "scripts": {
-    "build": "rm -rf dist/* && tsup lib/index.ts --dts --format esm",
+    "build": "rm -rf dist/* && tsup lib/index.ts --dts --format esm,cjs",
     "all:dev": "pnpm --stream --parallel --filter '*vue-store*' -w run dev",
     "dev": "tsc --watch",
     "example:dev": "pnpm --filter '*example' run dev",

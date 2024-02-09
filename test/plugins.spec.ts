@@ -149,5 +149,31 @@ describe('vue-store plugins', () => {
       expect(storedState.state.age).toEqual(5)
       expect('name' in storedState.state).toBe(false)
     })
+
+    it('refreshes data after manual update', async () => {
+      const module = flatten(
+        makeTestModule<IOldTestState>({
+          version: 1,
+          stateInit: getOldDefaultState,
+          plugins: [LocalStoragePlugin],
+        }),
+      )
+      // Update id
+      const newId = 1
+      module.updateId(newId)
+      // a workaround to wait until the Vue watch-effect is done
+      await Promise.resolve()
+
+      // Manually set localstorage
+      localStorage.setItem(
+        'test',
+        JSON.stringify({ state: { id: 9, name: 'manual' }, __version: 1 }),
+      )
+
+      // Refresh module and verify date is changed
+      module.refreshData()
+      expect(module.id.value).toEqual(9)
+      expect(module.name.value).toEqual('manual')
+    })
   })
 })

@@ -64,15 +64,21 @@ export function flatten<S extends IState, G extends IGetters, M extends IMutatio
     }
   }
 
+  // state
+  const initialState = getInitialState()
+  const state = reactive(initialState ?? ({} as S))
+
+  const refreshData = () => {
+    const updatedState = getInitialState()
+    Object.assign(state, updatedState ?? ({} as S))
+  }
+
   // metadata
   flattenedModule.__metadata = {
     name: options.name,
     version: options.version,
   }
-
-  // state
-  const initialState = getInitialState()
-  const state = reactive(initialState ?? ({} as S))
+  flattenedModule['refreshData'] = refreshData
 
   // map state properties to Ref<T>
   for (const key in state) {

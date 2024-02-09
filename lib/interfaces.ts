@@ -40,6 +40,7 @@ export type IFlattenedModule<
   M extends IMutations,
 > = {
   __metadata: IModuleMetadata
+  refreshData(): void
 } & {
   [key in keyof S]: DeepReadonly<Ref<S[key]>>
 } & {

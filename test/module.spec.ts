@@ -9,6 +9,7 @@ import {
   createModule,
   useModule,
 } from '../lib'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 type ITestModule = IModule<ITestState, ITestGetters, ITestMutations>
 
@@ -55,7 +56,6 @@ const makeTestModule = (
 describe('vue-store', () => {
   beforeEach(() => {
     localStorage.clear()
-    jest.clearAllMocks()
   })
 
   it('creates a module', () => {

@@ -4,9 +4,9 @@ runs:
   using: 'composite'
   steps:
     - name: Setup PNPM
-      uses: pnpm/action-setup@v2.2.4
+      uses: pnpm/action-setup@v4
       with:
-        version: 8.6.6
+        version: 9.5.0
     - name: Set up NodeJS v18
       uses: actions/setup-node@v3
       with:

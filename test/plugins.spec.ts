@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   ICreatePlugin,
   IGetters,
@@ -70,7 +71,6 @@ const makeTestModule = <S extends IBaseTestState>({
 describe('vue-store plugins', () => {
   beforeEach(() => {
     localStorage.clear()
-    jest.clearAllMocks()
   })
 
   describe('local stroage plugin', () => {

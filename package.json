@@ -27,14 +27,14 @@
     "lint": "oxlint -c .oxlintrc.json .",
     "format": "prettier -w \"{**/*,*}.{ts,js,json}\"",
     "format:check": "prettier --check \"{**/*,*}.{ts,js,json}\"",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "19.7.1",
     "@commitlint/config-conventional": "19.7.1",
     "@types/node": "^20.14.8",
     "happy-dom": "^17.0.2",
-    "husky": "^7.0.0",
+    "husky": "9.1.7",
     "oxlint": "^0.15.10",
     "prettier": "3.4.2",
     "ts-node": "^10.9.2",

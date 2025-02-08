@@ -5,11 +5,11 @@ export interface ILocalStoragePluginState<S extends IState> {
   __version: number
 }
 
-const migrateState = <S extends IState>(oldState: IState, newState: S): S => {
+const migrateState = <S extends IState>(oldState: IState, newDefaultState: S): S => {
   const migratedState = {} as S
 
-  for (const key in newState) {
-    const [oldValue, newValue] = [oldState[key], newState[key]]
+  for (const key in newDefaultState) {
+    const [oldValue, newValue] = [oldState[key], newDefaultState[key]]
     if (key in oldState && typeof oldValue === typeof newValue) {
       migratedState[key as keyof S] = oldValue
     } else {

@@ -1,6 +1,7 @@
 {
   "name": "@samatech/vue-store",
   "version": "0.7.0",
+  "description": "A small SPA storage system based on @vue/reactivity.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "exports": {

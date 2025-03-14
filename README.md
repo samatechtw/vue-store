@@ -176,4 +176,4 @@ pnpm run build
 
 ## License
 
-MIT License © 2022 [SamaTech Limited Company](https://github.com/samatechtw)
+MIT License © 2021 - 2025 [SamaTech Limited Company](https://github.com/samatechtw)
